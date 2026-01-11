@@ -7,6 +7,7 @@ export function Button({
   size = 'medium',
   className = '',
   disabled = false,
+  'data-testid': testId,
   ...props
 }: {
   children: React.ReactNode;
@@ -15,7 +16,8 @@ export function Button({
   size?: 'small' | 'medium' | 'large';
   className?: string;
   disabled?: boolean;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  'data-testid'?: string;
+} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'data-testid'>) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (disabled) {
       e.preventDefault();
@@ -25,7 +27,7 @@ export function Button({
     onClick?.();
   };
 
-  const finalTestId = disabled && props['data-testid'] ? `${props['data-testid']}-disabled` : props['data-testid'];
+  const finalTestId = disabled && testId ? `${testId}-disabled` : testId;
 
   return (
     <button
