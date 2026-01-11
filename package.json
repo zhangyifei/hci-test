@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "playwright test",
     "fetch:images": "bash scripts/fetch-images.sh",
     "postinstall": "npm run fetch:images || echo \"Image download skipped\""
   },
@@ -18,6 +19,7 @@
     "lucide-react": "^0.344.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.0",
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",

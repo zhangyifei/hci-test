@@ -29,7 +29,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   // Home screen
   if (state.currentScreen === 'home') {
     return (
-      <div className="screen screen-home">
+      <div className="screen screen-home" data-testid="screen" data-screen-id="home">
         <div className="hero-section">
           <div className="hero-image-wrapper">
             <Image
@@ -46,13 +46,14 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
           </div>
         </div>
         <div className="content-section">
-          <Button onClick={() => handleEvent({ type: 'GO_SERVICE' })} size="large">
+          <Button onClick={() => handleEvent({ type: 'GO_SERVICE' })} size="large" data-testid="cta-choose-service">
             Choose a service
           </Button>
           <Button
-            onClick={() => handleEvent({ type: 'GO_SERVICE' })}
+            onClick={() => handleEvent({ type: 'TASKA_SWITCH' })}
             variant="secondary"
             size="large"
+            data-testid="cta-switch-service"
           >
             Switch service
           </Button>
@@ -64,10 +65,10 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   // Services screen
   if (state.currentScreen === 'service') {
     return (
-      <div className="screen screen-services">
-        <h2 className="screen-title">Services</h2>
+      <div className="screen screen-services" data-testid="screen" data-screen-id="service">
+        <h2 className="screen-title" data-testid="screen-title">Services</h2>
         <div className="services-grid">
-          <Card hoverable onClick={() => handleEvent({ type: 'OPEN_RIDE' })}>
+          <Card hoverable onClick={() => handleEvent({ type: 'OPEN_RIDE' })} data-testid="card-open-ride">
             <div className="service-card">
               <div className="service-icon">
                 <Car size={32} />
@@ -78,7 +79,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
               </div>
             </div>
           </Card>
-          <Card hoverable onClick={() => handleEvent({ type: 'OPEN_SERVICE2' })}>
+          <Card hoverable onClick={() => handleEvent({ type: 'OPEN_SERVICE2' })} data-testid="card-open-service2">
             <div className="service-card">
               <div className="service-icon">
                 {config.service2Label === 'Package' ? (
@@ -101,7 +102,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   // Task A (Ride) screen
   if (state.currentScreen === 'taskA') {
     return (
-      <div className="screen screen-task">
+      <div className="screen screen-task" data-testid="screen" data-screen-id="taskA">
         <div className="task-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {config.showSharedNav && (
@@ -109,9 +110,9 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 <Home size={20} />
               </div>
             )}
-            <h2 className="screen-title">Ride</h2>
+            <h2 className="screen-title" data-testid="screen-title">Ride</h2>
           </div>
-          <Tag>Step {state.taskA.step} of 2</Tag>
+          <Tag data-testid="step-label">Step {state.taskA.step} of 2</Tag>
         </div>
 
         {state.taskA.step === 1 ? (
@@ -126,11 +127,12 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 <span className="map-distance">3.2 km</span>
               </div>
             </div>
-            <p className="task-body">Pick an option to continue.</p>
+            <p className="task-body" data-testid="body-text">Pick an option to continue.</p>
             <div className="chips-row">
               <Chip
                 selected={selectedOption === 'Standard'}
                 onClick={() => setSelectedOption('Standard')}
+                data-testid="taska-option-0"
               >
                 Standard
               </Chip>
@@ -151,6 +153,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
               onClick={() => handleEvent({ type: 'TASKA_CONTINUE' })}
               size="large"
               className="btn-fixed-bottom"
+              data-testid="primary-cta"
             >
               Continue
             </Button>
@@ -167,7 +170,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 <span className="map-distance">3.2 km</span>
               </div>
             </div>
-            <p className="task-body">Review your request.</p>
+            <p className="task-body" data-testid="body-text">Review your request.</p>
             <Card>
               <div className="summary-card">
                 <div className="summary-row">
@@ -184,6 +187,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
               <Button
                 onClick={() => handleEvent({ type: 'TASKA_CONTINUE' })}
                 size="large"
+                data-testid="primary-cta"
               >
                 Continue
               </Button>
@@ -191,12 +195,13 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 onClick={() => handleEvent({ type: 'TASKA_SWITCH' })}
                 variant="secondary"
                 size="large"
+                data-testid="secondary-cta"
               >
                 Switch service
               </Button>
             </div>
             {config.showCrossServiceHint && (
-              <p className="hint-text">Labels and navigation are consistent across services.</p>
+              <p className="hint-text" data-testid="cross-service-hint">Labels and navigation are consistent across services.</p>
             )}
           </div>
         )}
@@ -207,7 +212,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   // Switch screen
   if (state.currentScreen === 'switch') {
     return (
-      <div className="screen screen-switch">
+      <div className="screen screen-switch" data-testid="screen" data-screen-id="switch">
         <div className="task-header" style={{ marginBottom: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {config.showSharedNav && (
@@ -215,7 +220,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 <Home size={20} />
               </div>
             )}
-            <h2 className="screen-title">Switch service</h2>
+            <h2 className="screen-title" data-testid="screen-title">Switch service</h2>
           </div>
         </div>
         <p className="screen-subtitle">Choose another service to continue.</p>
@@ -223,20 +228,20 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
         <div className="cards-stack">
           {/* Resume card - only shown if Task A started and high interrelatedness */}
           {config.showResumeCue && state.taskA.started && (
-            <Card hoverable onClick={() => handleEvent({ type: 'RESUME_TASKA' })}>
+            <Card hoverable onClick={() => handleEvent({ type: 'RESUME_TASKA' })} data-testid="resume-card">
               <div className="resume-card">
                 <div className="resume-header">
-                  <h3>Resume Task A</h3>
-                  <span className="resume-badge">Progress saved</span>
+                  <h3 data-testid="resume-card-title">Resume Task A</h3>
+                  <span className="resume-badge" data-testid="resume-card-subtitle">Progress saved</span>
                 </div>
-                <Button variant="primary">Resume</Button>
+                <Button variant="primary" data-testid="resume-card-cta">Resume</Button>
               </div>
             </Card>
           )}
 
-          {/* Return to Ride card - available after TaskB completion if NOT in resume cue mode */}
-          {state.taskB.completed && !config.showResumeCue && (
-            <Card hoverable onClick={() => handleEvent({ type: 'SWITCH_TO_RIDE' })}>
+          {/* Return to Ride card - available after TaskB completion if NOT in resume cue mode OR if Task A wasn't started */}
+          {state.taskB.completed && (!config.showResumeCue || !state.taskA.started) && (
+            <Card hoverable onClick={() => handleEvent({ type: 'SWITCH_TO_RIDE' })} data-testid="card-go-ride">
               <div className="service-switch-card">
                 <Car size={24} />
                 <h3>Go to Ride</h3>
@@ -246,7 +251,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
 
           {/* Service 2 card - available before TaskB completion */}
           {!state.taskB.completed && (
-            <Card hoverable onClick={() => handleEvent({ type: 'SWITCH_TO_SERVICE2' })}>
+            <Card hoverable onClick={() => handleEvent({ type: 'SWITCH_TO_SERVICE2' })} data-testid="card-go-service2">
               <div className="service-switch-card">
                 {config.service2Label === 'Package' ? (
                   <Package size={24} />
@@ -260,7 +265,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
         </div>
 
         {config.showCrossServiceHint && (
-          <p className="hint-text">Labels and navigation are consistent across services.</p>
+          <p className="hint-text" data-testid="cross-service-hint">Labels and navigation are consistent across services.</p>
         )}
       </div>
     );
@@ -269,7 +274,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   // Task B screen
   if (state.currentScreen === 'taskB') {
     return (
-      <div className="screen screen-task">
+      <div className="screen screen-task" data-testid="screen" data-screen-id="taskB">
         <div className="task-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {config.showSharedNav && (
@@ -277,15 +282,15 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 <Home size={20} />
               </div>
             )}
-            <h2 className="screen-title">{config.service2Label}</h2>
+            <h2 className="screen-title" data-testid="screen-title">{config.service2Label}</h2>
           </div>
-          <Tag>Step {state.taskB.step} of 2</Tag>
+          <Tag data-testid="step-label">Step {state.taskB.step} of 2</Tag>
         </div>
 
         {state.taskB.step === 1 ? (
           <div className="content-section">
             {config.taskBModel === 'review_confirm' ? (
-              <>
+              <div data-testid="taskb-model-review">
                 <div className="map-view">
                   <div className="map-background"></div>
                   <div className="map-route map-route-delivery"></div>
@@ -296,7 +301,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                     <span className="map-distance">5.8 km</span>
                   </div>
                 </div>
-                <p className="task-body">Review the details below.</p>
+                <p className="task-body" data-testid="body-text">Review the details below.</p>
                 <Card>
                   <div className="summary-card">
                     <div className="summary-row">
@@ -309,10 +314,10 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                     </div>
                   </div>
                 </Card>
-              </>
+              </div>
             ) : (
-              <>
-                <p className="task-body">Select items to add.</p>
+              <div data-testid="taskb-model-compose">
+                <p className="task-body" data-testid="body-text">Select items to add.</p>
                 <div className="grocery-grid">
                   <div 
                     className={`grocery-item ${selectedItems.includes('Apples') ? 'grocery-item-selected' : ''}`}
@@ -323,6 +328,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                           : [...prev, 'Apples']
                       )
                     }
+                    data-testid="compose-chip"
                   >
                     <div className="grocery-image-wrapper">
                       <Image
@@ -344,6 +350,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                           : [...prev, 'Bread']
                       )
                     }
+                    data-testid="compose-chip"
                   >
                     <div className="grocery-image-wrapper">
                       <Image
@@ -365,6 +372,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                           : [...prev, 'Milk']
                       )
                     }
+                    data-testid="compose-chip"
                   >
                     <div className="grocery-image-wrapper">
                       <Image
@@ -385,22 +393,23 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                     </p>
                   )}
                 </div>
-              </>
+              </div>
             )}
             <Button
               onClick={() => handleEvent({ type: 'TASKB_CONTINUE' })}
               size="large"
               className="btn-fixed-bottom"
+              data-testid="primary-cta"
             >
               Continue
             </Button>
             {config.showCrossServiceHint && (
-              <p className="hint-text">Labels and navigation are consistent across services.</p>
+              <p className="hint-text" data-testid="cross-service-hint">Labels and navigation are consistent across services.</p>
             )}
           </div>
         ) : (
           <div className="content-section">
-            <p className="task-body">Ready to confirm.</p>
+            <p className="task-body" data-testid="body-text">Ready to confirm.</p>
             <Card>
               <div className="summary-card">
                 {config.taskBModel === 'review_confirm' ? (
@@ -434,6 +443,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
               onClick={() => handleEvent({ type: 'TASKB_CONFIRM' })}
               size="large"
               className="btn-fixed-bottom"
+              data-testid="primary-cta"
             >
               Confirm
             </Button>
@@ -446,7 +456,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   // Resume Task A screen
   if (state.currentScreen === 'resumeA') {
     return (
-      <div className="screen screen-task">
+      <div className="screen screen-task" data-testid="screen" data-screen-id="resumeA">
         <div className="task-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {config.showSharedNav && (
@@ -454,11 +464,11 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 <Home size={20} />
               </div>
             )}
-            <h2 className="screen-title">
+            <h2 className="screen-title" data-testid="screen-title">
               {config.showResumeCue ? 'Resume Task A' : 'Ride'}
             </h2>
           </div>
-          <Tag>Step 2 of 2</Tag>
+          <Tag data-testid="step-label">Step 2 of 2</Tag>
         </div>
         <div className="content-section">
           <div className="map-view">
@@ -471,9 +481,9 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
               <span className="map-distance">3.2 km</span>
             </div>
           </div>
-          <p className="task-body">Continue from where you left off.</p>
+          <p className="task-body" data-testid="body-text">Continue from where you left off.</p>
           {config.showResumeCue && (
-            <p className="state-cue">Your progress is preserved.</p>
+            <p className="state-cue" data-testid="state-cue">Your progress is preserved.</p>
           )}
           <Card>
             <div className="summary-card">
@@ -491,11 +501,12 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
             onClick={() => handleEvent({ type: 'FINISH_TASKA' })}
             size="large"
             className="btn-fixed-bottom"
+            data-testid="primary-cta"
           >
             Finish Task A
           </Button>
           {config.showCrossServiceHint && (
-            <p className="hint-text">Labels and navigation are consistent across services.</p>
+            <p className="hint-text" data-testid="cross-service-hint">Labels and navigation are consistent across services.</p>
           )}
         </div>
       </div>
@@ -505,16 +516,17 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   // Finish screen
   if (state.currentScreen === 'finish') {
     return (
-      <div className="screen screen-finish">
+      <div className="screen screen-finish" data-testid="screen" data-screen-id="finish">
         <div className="finish-content">
           <div className="finish-icon">✓</div>
-          <h2 className="screen-title">All set</h2>
-          <p className="screen-subtitle">You&apos;ve completed today&apos;s tasks.</p>
+          <h2 className="screen-title" data-testid="screen-title">All set</h2>
+          <p className="screen-subtitle" data-testid="body-text">You&apos;ve completed today&apos;s tasks.</p>
         </div>
         <div className="button-group">
           <Button
             onClick={() => handleEvent({ type: 'RETURN_HOME' })}
             size="large"
+            data-testid="primary-cta"
           >
             Return to Home
           </Button>

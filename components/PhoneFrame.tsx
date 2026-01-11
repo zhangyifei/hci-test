@@ -9,19 +9,19 @@ interface PhoneFrameProps {
 
 export function PhoneFrame({ children, config }: PhoneFrameProps) {
   return (
-    <div className="phone-frame">
+    <div className="phone-frame" data-testid="phone-frame">
       <div className="phone-screen">
         <div className="app-header">
           <div className="header-left">
             <MapPin size={20} />
             <div className="header-text">
-              <div className="header-title">Downtown</div>
-              <div className="header-subtitle">Today • 2 tasks</div>
+              <div className="header-title" data-testid="header-title">Downtown</div>
+              <div className="header-subtitle" data-testid="header-subtitle">Today • 2 tasks</div>
             </div>
           </div>
           <div className="header-right">
             {config.showSharedNav && (
-              <div className="shared-nav-chip">Home</div>
+              <div className="shared-nav-chip" data-testid="home-chip">Home</div>
             )}
             <button className="icon-button">
               <Bell size={20} />
@@ -31,7 +31,7 @@ export function PhoneFrame({ children, config }: PhoneFrameProps) {
 
         <main className="app-main">{children}</main>
 
-        <div className="app-tab-bar">
+        <div className="app-tab-bar" data-testid="tabbar">
           <button className="tab-item tab-active">
             <Home size={20} />
             <span>Home</span>
