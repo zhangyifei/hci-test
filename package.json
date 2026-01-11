@@ -8,9 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "playwright test",
-    "fetch:images": "bash scripts/fetch-images.sh",
-    "postinstall": "npm run fetch:images || echo \"Image download skipped\""
+    "test": "playwright test"
   },
   "dependencies": {
     "next": "^14.2.0",
