@@ -32,9 +32,11 @@ async function startTaskA(page: Page) {
   await clickByTestId(page, 'primary-cta'); // Continue
 
   // 4. Task A Step 2 (Start)
+  await assertOnScreen(page, 'taskA');
   await expect(page.getByTestId('step-label')).toContainText('Step 2');
   await clickByTestId(page, 'primary-cta'); // Mark started
   // Remains on Step 2
+  await assertOnScreen(page, 'taskA');
   await expect(page.getByTestId('step-label')).toContainText('Step 2');
 }
 
@@ -54,11 +56,13 @@ async function returnToRideFromSwitch(page: Page, interrelatednessHigh: boolean)
     await expect(page.getByTestId('card-go-ride')).not.toBeVisible();
 
     await clickByTestId(page, 'resume-card-cta'); // Resume
+    await assertOnScreen(page, 'resumeA');
   } else {
     // Low Int: Standard Card
     await expect(page.getByTestId('resume-card')).not.toBeVisible();
     await expect(page.getByTestId('card-go-ride')).toBeVisible();
     await clickByTestId(page, 'card-go-ride');
+    await assertOnScreen(page, 'resumeA');
   }
 }
 
@@ -101,8 +105,12 @@ test('c1: Low Het x Low Int', async ({ page }) => {
   // Verify shell cues
   await expectInterrelatednessCues(page, false);
 
-  // Workflow
+  // Workflow: home → service → taskA Step 1 → taskA Step 2
   await startTaskA(page);
+  // Verify we're on taskA Step 2 after startTaskA
+  await assertOnScreen(page, 'taskA');
+  
+  // taskA Step 2 → switch
   await goToSwitchFromTaskA(page);
 
   // Switch: Resume card check (Should NOT exist even if started)
@@ -125,12 +133,14 @@ test('c1: Low Het x Low Int', async ({ page }) => {
   await expect(page.getByTestId('cross-service-hint')).not.toBeVisible();
 
   // TaskB Step 1 - Verify step label
+  await assertOnScreen(page, 'taskB');
   await expect(page.getByTestId('step-label')).toContainText('Step 1');
   
-  // Continue Task B
+  // taskB Step 1 → Continue → taskB Step 2
   await clickByTestId(page, 'primary-cta');
   
   // TaskB Step 2 - Verify step label
+  await assertOnScreen(page, 'taskB');
   await expect(page.getByTestId('step-label')).toContainText('Step 2');
   await clickByTestId(page, 'primary-cta'); // Confirm
   await assertOnScreen(page, 'switch');
@@ -157,14 +167,16 @@ test('c2: Low Het x High Int', async ({ page }) => {
   
   await gotoCondition(page, 'c2');
 
-  // Verify shell cues
+  // Verify shell cues on home
   await expectInterrelatednessCues(page, true);
 
-  // Workflow
+  // Workflow: home → service → taskA Step 1 → taskA Step 2
   await startTaskA(page);
-  // Hint check on Task A
+  // Verify we're on taskA Step 2 and hint visible
+  await assertOnScreen(page, 'taskA');
   await expect(page.getByTestId('cross-service-hint')).toBeVisible();
   
+  // taskA Step 2 → switch
   await goToSwitchFromTaskA(page);
   
   // Switch: Resume card check (Should exist now)
@@ -178,12 +190,15 @@ test('c2: Low Het x High Int', async ({ page }) => {
   await expect(page.getByTestId('taskb-model-compose')).not.toBeVisible();
   
   // TaskB Step 1 - Verify step label and cross-service hint
+  await assertOnScreen(page, 'taskB');
   await expect(page.getByTestId('step-label')).toContainText('Step 1');
   await expect(page.getByTestId('cross-service-hint')).toBeVisible();
   
+  // taskB Step 1 → Continue → taskB Step 2
   await clickByTestId(page, 'primary-cta');
   
   // TaskB Step 2 - Verify step label
+  await assertOnScreen(page, 'taskB');
   await expect(page.getByTestId('step-label')).toContainText('Step 2');
   await clickByTestId(page, 'primary-cta'); // Confirm
   await assertOnScreen(page, 'switch');
@@ -202,10 +217,15 @@ test('c2: Low Het x High Int', async ({ page }) => {
 test('c3: High Het x Low Int', async ({ page }) => {
   await gotoCondition(page, 'c3');
 
-  // Verify shell cues
+  // Verify shell cues on home
   await expectInterrelatednessCues(page, false);
 
+  // Workflow: home → service → taskA Step 1 → taskA Step 2
   await startTaskA(page);
+  // Verify we're on taskA Step 2
+  await assertOnScreen(page, 'taskA');
+  
+  // taskA Step 2 → switch
   await goToSwitchFromTaskA(page);
 
   // Switch: Resume card check (Should NOT exist)
@@ -223,12 +243,15 @@ test('c3: High Het x Low Int', async ({ page }) => {
   expect(await page.getByTestId('compose-chip').count()).toBeGreaterThanOrEqual(2);
   
   // TaskB Step 1 - Verify step label and NO cross-service hint
+  await assertOnScreen(page, 'taskB');
   await expect(page.getByTestId('step-label')).toContainText('Step 1');
   await expect(page.getByTestId('cross-service-hint')).not.toBeVisible();
 
+  // taskB Step 1 → Continue → taskB Step 2
   await clickByTestId(page, 'primary-cta');
   
   // TaskB Step 2 - Verify step label
+  await assertOnScreen(page, 'taskB');
   await expect(page.getByTestId('step-label')).toContainText('Step 2');
   await clickByTestId(page, 'primary-cta');
   await assertOnScreen(page, 'switch');
@@ -252,10 +275,15 @@ test('c4: High Het x High Int', async ({ page }) => {
   await expect(page.getByTestId('resume-card')).not.toBeVisible();
   await gotoCondition(page, 'c4');
 
-  // Verify shell cues
+  // Verify shell cues on home
   await expectInterrelatednessCues(page, true);
 
+  // Workflow: home → service → taskA Step 1 → taskA Step 2
   await startTaskA(page);
+  // Verify we're on taskA Step 2
+  await assertOnScreen(page, 'taskA');
+  
+  // taskA Step 2 → switch
   await goToSwitchFromTaskA(page);
 
   // Switch: Resume card check
@@ -271,12 +299,15 @@ test('c4: High Het x High Int', async ({ page }) => {
   expect(await page.getByTestId('compose-chip').count()).toBeGreaterThanOrEqual(2);
   
   // TaskB Step 1 - Verify step label and cross-service hint
+  await assertOnScreen(page, 'taskB');
   await expect(page.getByTestId('step-label')).toContainText('Step 1');
   await expect(page.getByTestId('cross-service-hint')).toBeVisible();
 
+  // taskB Step 1 → Continue → taskB Step 2
   await clickByTestId(page, 'primary-cta');
   
   // TaskB Step 2 - Verify step label
+  await assertOnScreen(page, 'taskB');
   await expect(page.getByTestId('step-label')).toContainText('Step 2');
   await clickByTestId(page, 'primary-cta');
   await assertOnScreen(page, 'switch');
