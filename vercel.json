@@ -1,0 +1,6 @@
+{
+  "installCommand": "npm install --loglevel=info",
+  "buildCommand": "next build",
+  "devCommand": "next dev",
+  "framework": "nextjs"
+}
