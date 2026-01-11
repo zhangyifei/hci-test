@@ -171,6 +171,12 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
               </div>
             </div>
             <p className="task-body" data-testid="body-text">Review your request.</p>
+            {!state.taskA.started && (
+              <p className="state-cue" data-testid="state-cue-start">Tap Continue to start your ride.</p>
+            )}
+            {state.taskA.started && (
+              <p className="state-cue" data-testid="state-cue-started">Your ride has started.</p>
+            )}
             <Card>
               <div className="summary-card">
                 <div className="summary-row">
@@ -179,7 +185,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 </div>
                 <div className="summary-row">
                   <span className="summary-label">Status:</span>
-                  <span className="summary-value">Ready to confirm</span>
+                  <span className="summary-value">{state.taskA.started ? 'In progress' : 'Ready to confirm'}</span>
                 </div>
               </div>
             </Card>
@@ -188,8 +194,9 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 onClick={() => handleEvent({ type: 'TASKA_CONTINUE' })}
                 size="large"
                 data-testid="primary-cta"
+                disabled={state.taskA.started}
               >
-                Continue
+                {state.taskA.started ? 'Started' : 'Continue'}
               </Button>
               <Button
                 onClick={() => handleEvent({ type: 'TASKA_SWITCH' })}
