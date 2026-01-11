@@ -1,0 +1,10 @@
+{
+  "id": "c3",
+  "heterogeneity": "high",
+  "interrelatedness": "low",
+  "service2Label": "Grocery",
+  "taskBModel": "compose_confirm",
+  "showSharedNav": false,
+  "showResumeCue": false,
+  "showCrossServiceHint": false
+}

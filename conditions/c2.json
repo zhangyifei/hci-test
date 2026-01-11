@@ -1,0 +1,10 @@
+{
+  "id": "c2",
+  "heterogeneity": "low",
+  "interrelatedness": "high",
+  "service2Label": "Package",
+  "taskBModel": "review_confirm",
+  "showSharedNav": true,
+  "showResumeCue": true,
+  "showCrossServiceHint": true
+}
