@@ -22,6 +22,9 @@ export default function HomePage() {
           <p>
             Each condition manipulates two factors while keeping interaction mechanics constant.
           </p>
+          <Link href="/docs" className="docs-link">
+            📖 View Execution Steps Documentation →
+          </Link>
         </div>
 
         <div className="conditions-grid">

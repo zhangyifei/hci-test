@@ -52,6 +52,7 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       break;
 
     case 'TASKA_SWITCH':
+      // Always send to switch; UI will gate what is shown
       newState.currentScreen = 'switch';
       newState.timestamps['TASKA_SWITCH'] = now;
       break;

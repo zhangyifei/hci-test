@@ -6,6 +6,7 @@ export function Button({
   variant = 'primary',
   size = 'medium',
   className = '',
+  disabled = false,
   ...props
 }: {
   children: React.ReactNode;
@@ -13,12 +14,27 @@ export function Button({
   variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'small' | 'medium' | 'large';
   className?: string;
+  disabled?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    onClick?.();
+  };
+
+  const finalTestId = disabled && props['data-testid'] ? `${props['data-testid']}-disabled` : props['data-testid'];
+
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       className={`btn btn-${variant} btn-${size} ${className}`}
+      disabled={disabled}
+      aria-disabled={disabled}
       {...props}
+      data-testid={finalTestId}
     >
       {children}
     </button>

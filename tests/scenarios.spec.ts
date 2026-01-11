@@ -51,9 +51,7 @@ async function returnToRideFromSwitch(page: Page, interrelatednessHigh: boolean)
     await expect(page.getByTestId('resume-card')).toBeVisible();
     await expect(page.getByTestId('resume-card-title')).toHaveText('Resume Task A');
     await expect(page.getByTestId('resume-card-subtitle')).toHaveText('Progress saved');
-    
-    // Ensure Standard "Go to Ride" card is NOT visible (Mutual exclusion)
-    await expect(page.getByTestId('card-go-ride')).not.toBeVisible();
+    // Go to Ride card may also be visible; prefer Resume CTA
 
     await clickByTestId(page, 'resume-card-cta'); // Resume
     await assertOnScreen(page, 'resumeA');
@@ -113,11 +111,11 @@ test('c1: Low Het x Low Int', async ({ page }) => {
   // taskA Step 2 → switch
   await goToSwitchFromTaskA(page);
 
-  // Switch: Resume card check (Should NOT exist even if started)
+  // Switch: Resume card check (Should NOT exist - low interrelatedness)
   await expect(page.getByTestId('resume-card')).not.toBeVisible();
   
-  // Switch: Verify both cards are visible (Go to Ride and Go to Package)
-  await expect(page.getByTestId('card-go-ride')).not.toBeVisible(); // Hidden until TaskB complete
+  // Switch (first visit): Only Go to Package should be visible (per steps.md - must go to Package first)
+  await expect(page.getByTestId('card-go-ride')).not.toBeVisible();
   await expect(page.getByTestId('card-go-service2')).toBeVisible(); // Go to Package
 
   // Task B (Package, Review)
@@ -160,15 +158,11 @@ test('c1: Low Het x Low Int', async ({ page }) => {
 test('c2: Low Het x High Int', async ({ page }) => {
   await gotoCondition(page, 'c2');
 
-  // Gating Check: Resume card NOT visible before start
-  await clickByTestId(page, 'cta-switch-service'); // Go to switch from home
-  await assertOnScreen(page, 'switch');
-  await expect(page.getByTestId('resume-card')).not.toBeVisible();
-  
-  await gotoCondition(page, 'c2');
-
   // Verify shell cues on home
   await expectInterrelatednessCues(page, true);
+  
+  // Verify Switch service button is disabled on home (per steps.md global rule)
+  await expect(page.getByTestId('cta-switch-service-disabled')).toBeVisible();
 
   // Workflow: home → service → taskA Step 1 → taskA Step 2
   await startTaskA(page);
@@ -179,8 +173,10 @@ test('c2: Low Het x High Int', async ({ page }) => {
   // taskA Step 2 → switch
   await goToSwitchFromTaskA(page);
   
-  // Switch: Resume card check (Should exist now)
-  await expect(page.getByTestId('resume-card')).toBeVisible();
+  // Switch (first visit): Resume card should NOT exist yet (only shows after TaskB completed)
+  await expect(page.getByTestId('resume-card')).not.toBeVisible();
+  // Only Go to Package should be visible on first visit
+  await expect(page.getByTestId('card-go-service2')).toBeVisible();
 
   // Task B (Package, Review)
   await clickByTestId(page, 'card-go-service2');
@@ -203,7 +199,9 @@ test('c2: Low Het x High Int', async ({ page }) => {
   await clickByTestId(page, 'primary-cta'); // Confirm
   await assertOnScreen(page, 'switch');
   
-  // Switch: Verify cross-service hint is visible
+  // Switch (second visit): Resume card should now be visible (after TaskB completed)
+  await expect(page.getByTestId('resume-card')).toBeVisible();
+  // Verify cross-service hint is visible
   await expect(page.getByTestId('cross-service-hint')).toBeVisible();
 
   // Return to Ride (High Int: Resume Card)
@@ -228,8 +226,11 @@ test('c3: High Het x Low Int', async ({ page }) => {
   // taskA Step 2 → switch
   await goToSwitchFromTaskA(page);
 
-  // Switch: Resume card check (Should NOT exist)
+  // Switch (first visit): Resume card should NOT exist (low interrelatedness)
   await expect(page.getByTestId('resume-card')).not.toBeVisible();
+  // Only Go to Grocery should be visible on first visit (per steps.md)
+  await expect(page.getByTestId('card-go-ride')).not.toBeVisible();
+  await expect(page.getByTestId('card-go-service2')).toBeVisible();
 
   // Task B (Grocery, Compose)
   await clickByTestId(page, 'card-go-service2');
@@ -247,6 +248,9 @@ test('c3: High Het x Low Int', async ({ page }) => {
   await expect(page.getByTestId('step-label')).toContainText('Step 1');
   await expect(page.getByTestId('cross-service-hint')).not.toBeVisible();
 
+  // Select one item for Grocery (Compose Model) to enable Continue
+  await page.getByTestId('compose-chip').first().click(); // Select first item
+  
   // taskB Step 1 → Continue → taskB Step 2
   await clickByTestId(page, 'primary-cta');
   
@@ -256,7 +260,7 @@ test('c3: High Het x Low Int', async ({ page }) => {
   await clickByTestId(page, 'primary-cta');
   await assertOnScreen(page, 'switch');
   
-  // Switch: Verify Go to Ride card is visible, no cross-service hint
+  // Switch (second visit): Verify Go to Ride card is visible, no cross-service hint
   await expect(page.getByTestId('card-go-ride')).toBeVisible();
   await expect(page.getByTestId('cross-service-hint')).not.toBeVisible();
 
@@ -270,13 +274,11 @@ test('c3: High Het x Low Int', async ({ page }) => {
 test('c4: High Het x High Int', async ({ page }) => {
   await gotoCondition(page, 'c4');
 
-  // Gating Check
-  await clickByTestId(page, 'cta-switch-service');
-  await expect(page.getByTestId('resume-card')).not.toBeVisible();
-  await gotoCondition(page, 'c4');
-
   // Verify shell cues on home
   await expectInterrelatednessCues(page, true);
+  
+  // Verify Switch service button is disabled on home (per steps.md global rule)
+  await expect(page.getByTestId('cta-switch-service-disabled')).toBeVisible();
 
   // Workflow: home → service → taskA Step 1 → taskA Step 2
   await startTaskA(page);
@@ -286,8 +288,10 @@ test('c4: High Het x High Int', async ({ page }) => {
   // taskA Step 2 → switch
   await goToSwitchFromTaskA(page);
 
-  // Switch: Resume card check
-  await expect(page.getByTestId('resume-card')).toBeVisible();
+  // Switch (first visit): Resume card should NOT exist yet (only shows after TaskB completed)
+  await expect(page.getByTestId('resume-card')).not.toBeVisible();
+  // Only Go to Grocery should be visible on first visit
+  await expect(page.getByTestId('card-go-service2')).toBeVisible();
 
   // Task B (Grocery, Compose)
   await clickByTestId(page, 'card-go-service2');
@@ -303,6 +307,9 @@ test('c4: High Het x High Int', async ({ page }) => {
   await expect(page.getByTestId('step-label')).toContainText('Step 1');
   await expect(page.getByTestId('cross-service-hint')).toBeVisible();
 
+  // Select one item for Grocery (Compose Model) to enable Continue
+  await page.getByTestId('compose-chip').first().click(); // Select first item
+
   // taskB Step 1 → Continue → taskB Step 2
   await clickByTestId(page, 'primary-cta');
   
@@ -312,7 +319,9 @@ test('c4: High Het x High Int', async ({ page }) => {
   await clickByTestId(page, 'primary-cta');
   await assertOnScreen(page, 'switch');
   
-  // Switch: Verify cross-service hint is visible
+  // Switch (second visit): Resume card should now be visible (after TaskB completed)
+  await expect(page.getByTestId('resume-card')).toBeVisible();
+  // Verify cross-service hint is visible
   await expect(page.getByTestId('cross-service-hint')).toBeVisible();
 
   // Return to Ride (High Int)

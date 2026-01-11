@@ -32,22 +32,22 @@ export function PhoneFrame({ children, config }: PhoneFrameProps) {
         <main className="app-main">{children}</main>
 
         <div className="app-tab-bar" data-testid="tabbar">
-          <button className="tab-item tab-active">
+          <div className="tab-item tab-active">
             <Home size={20} />
             <span>Home</span>
-          </button>
-          <button className="tab-item">
+          </div>
+          <div className="tab-item">
             <Grid3x3 size={20} />
             <span>Services</span>
-          </button>
-          <button className="tab-item">
+          </div>
+          <div className="tab-item">
             <Activity size={20} />
             <span>Activity</span>
-          </button>
-          <button className="tab-item">
+          </div>
+          <div className="tab-item">
             <User size={20} />
             <span>Account</span>
-          </button>
+          </div>
         </div>
       </div>
     </div>

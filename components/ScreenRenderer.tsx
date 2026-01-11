@@ -16,6 +16,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   const [state, dispatch] = useReducer(flowReducer, initialState);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const interrelatednessHigh = config.interrelatedness === 'high';
 
   useEffect(() => {
     logEvent(config.id, 'SCREEN_VIEW', state.currentScreen, { state });
@@ -54,6 +55,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
             variant="secondary"
             size="large"
             data-testid="cta-switch-service"
+            disabled
           >
             Switch service
           </Button>
@@ -63,6 +65,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
   }
 
   // Services screen
+  // Per flow: service → tap Open Ride → taskA (only Ride is the intended path)
   if (state.currentScreen === 'service') {
     return (
       <div className="screen screen-services" data-testid="screen" data-screen-id="service">
@@ -79,8 +82,8 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
               </div>
             </div>
           </Card>
-          <Card hoverable onClick={() => handleEvent({ type: 'OPEN_SERVICE2' })} data-testid="card-open-service2">
-            <div className="service-card">
+          <Card data-testid="card-open-service2" className="card-disabled">
+            <div className="service-card service-card-disabled">
               <div className="service-icon">
                 {config.service2Label === 'Package' ? (
                   <Package size={32} />
@@ -90,7 +93,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
               </div>
               <div className="service-info">
                 <h3 className="service-title">{config.service2Label}</h3>
-                <Button variant="primary">Open {config.service2Label}</Button>
+                <Button variant="primary" disabled>Open {config.service2Label}</Button>
               </div>
             </div>
           </Card>
@@ -149,14 +152,25 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 Shared
               </Chip>
             </div>
-            <Button
-              onClick={() => handleEvent({ type: 'TASKA_CONTINUE' })}
-              size="large"
-              className="btn-fixed-bottom"
-              data-testid="primary-cta"
-            >
-              Continue
-            </Button>
+            <div className="button-group">
+              <Button
+                onClick={() => handleEvent({ type: 'TASKA_CONTINUE' })}
+                size="large"
+                data-testid="primary-cta"
+                disabled={selectedOption === null}
+              >
+                Continue
+              </Button>
+              <Button
+                onClick={() => handleEvent({ type: 'TASKA_SWITCH' })}
+                variant="secondary"
+                size="large"
+                data-testid="secondary-cta"
+                disabled
+              >
+                Switch service
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="content-section">
@@ -203,6 +217,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 variant="secondary"
                 size="large"
                 data-testid="secondary-cta"
+                disabled={!state.taskA.started}
               >
                 Switch service
               </Button>
@@ -233,8 +248,8 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
         <p className="screen-subtitle">Choose another service to continue.</p>
 
         <div className="cards-stack">
-          {/* Resume card - only shown if Task A started and high interrelatedness */}
-          {config.showResumeCue && state.taskA.started && (
+          {/* Resume card - only for high interrelatedness after Task B completed */}
+          {config.showResumeCue && interrelatednessHigh && state.taskB.completed && (
             <Card hoverable onClick={() => handleEvent({ type: 'RESUME_TASKA' })} data-testid="resume-card">
               <div className="resume-card">
                 <div className="resume-header">
@@ -246,9 +261,14 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
             </Card>
           )}
 
-          {/* Return to Ride card - available after TaskB completion if NOT in resume cue mode OR if Task A wasn't started */}
-          {state.taskB.completed && (!config.showResumeCue || !state.taskA.started) && (
-            <Card hoverable onClick={() => handleEvent({ type: 'SWITCH_TO_RIDE' })} data-testid="card-go-ride">
+          {/* Go to Ride: only shown after TaskB is completed (low interrelatedness path) */}
+          {/* Hide if Resume Card is shown (high interrelatedness uses Resume card instead) */}
+          {state.taskB.completed && !(config.showResumeCue && interrelatednessHigh) && (
+            <Card
+              hoverable
+              onClick={() => handleEvent({ type: 'SWITCH_TO_RIDE' })}
+              data-testid="card-go-ride"
+            >
               <div className="service-switch-card">
                 <Car size={24} />
                 <h3>Go to Ride</h3>
@@ -256,7 +276,7 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
             </Card>
           )}
 
-          {/* Service 2 card - available before TaskB completion */}
+          {/* Service 2 card - only before TaskB completion */}
           {!state.taskB.completed && (
             <Card hoverable onClick={() => handleEvent({ type: 'SWITCH_TO_SERVICE2' })} data-testid="card-go-service2">
               <div className="service-switch-card">
@@ -402,14 +422,25 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
                 </div>
               </div>
             )}
-            <Button
-              onClick={() => handleEvent({ type: 'TASKB_CONTINUE' })}
-              size="large"
-              className="btn-fixed-bottom"
-              data-testid="primary-cta"
-            >
-              Continue
-            </Button>
+            <div className="button-group">
+              <Button
+                onClick={() => handleEvent({ type: 'TASKB_CONTINUE' })}
+                size="large"
+                data-testid="primary-cta"
+                disabled={config.taskBModel !== 'review_confirm' && selectedItems.length < 1}
+              >
+                Continue
+              </Button>
+              <Button
+                onClick={() => handleEvent({ type: 'TASKB_CONFIRM' })}
+                variant="secondary"
+                size="large"
+                data-testid="confirm-cta"
+                disabled
+              >
+                Confirm
+              </Button>
+            </div>
             {config.showCrossServiceHint && (
               <p className="hint-text" data-testid="cross-service-hint">Labels and navigation are consistent across services.</p>
             )}
