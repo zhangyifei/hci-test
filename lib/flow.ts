@@ -91,9 +91,11 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       break;
 
     case 'RETURN_HOME':
-      newState.currentScreen = 'home';
-      newState.timestamps['RETURN_HOME'] = now;
-      break;
+      // Reset all state to initial when returning home for a fresh start
+      return {
+        ...initialState,
+        timestamps: { 'RETURN_HOME': now },
+      };
 
     default:
       break;
