@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useReducer, useEffect, useState } from 'react';
-import { Car, Package, ShoppingBasket, Home } from 'lucide-react';
+import { Car, Package, ShoppingBasket, Home, MapPin, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { ConditionConfig, FlowEvent } from '@/lib/types';
 import { flowReducer, initialState } from '@/lib/flow';
@@ -22,6 +22,14 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
     logEvent(config.id, 'SCREEN_VIEW', state.currentScreen, { state });
   }, [state.currentScreen, config.id, state]);
 
+  // Reset local selections when returning to home screen for a fresh start
+  useEffect(() => {
+    if (state.currentScreen === 'home') {
+      setSelectedOption(null);
+      setSelectedItems([]);
+    }
+  }, [state.currentScreen]);
+
   const handleEvent = (event: FlowEvent) => {
     logEvent(config.id, event.type, state.currentScreen, event);
     dispatch(event);
@@ -29,35 +37,76 @@ export function ScreenRenderer({ config }: ScreenRendererProps) {
 
   // Home screen
   if (state.currentScreen === 'home') {
+    const getGreeting = () => {
+      const hour = new Date().getHours();
+      if (hour < 12) return 'Good morning';
+      if (hour < 18) return 'Good afternoon';
+      return 'Good evening';
+    };
+
     return (
       <div className="screen screen-home" data-testid="screen" data-screen-id="home">
-        <div className="hero-section">
-          <div className="hero-image-wrapper">
-            <Image
-              src="/img/map-placeholder.jpg"
-              alt="Map"
-              fill
-              className="hero-image"
-              sizes="390px"
-              priority
-            />
-            <div className="hero-overlay">
-              <h1 className="hero-headline">Continue your day</h1>
+        {/* Header with greeting */}
+        <div className="home-header">
+          <div className="home-greeting">
+            <span className="greeting-text">{getGreeting()}</span>
+            <h1 className="greeting-name">Ready to go?</h1>
+          </div>
+          <div className="home-avatar">
+            <div className="avatar-circle">
+              <Sparkles size={20} />
             </div>
           </div>
         </div>
-        <div className="content-section">
-          <Button onClick={() => handleEvent({ type: 'GO_SERVICE' })} size="large" data-testid="cta-choose-service">
-            Choose a service
-          </Button>
-          <Button
-            onClick={() => handleEvent({ type: 'TASKA_SWITCH' })}
-            variant="secondary"
-            size="large"
-            data-testid="cta-switch-service"
-            disabled
+
+        {/* Map preview */}
+        <div className="home-map-section">
+          <Image
+            src="/img/map-placeholder.jpg"
+            alt="Map"
+            fill
+            className="map-preview-image"
+            sizes="390px"
+            priority
+          />
+          <div className="map-preview-overlay">
+            <div className="map-current-location">
+              <div className="location-pulse"></div>
+              <div className="location-dot"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Service icons (visual only, not clickable) */}
+        <div className="home-services-preview">
+          <div className="service-preview-item">
+            <div className="service-preview-icon service-preview-ride">
+              <Car size={20} />
+            </div>
+            <span>Ride</span>
+          </div>
+          <div className="service-preview-item">
+            <div className="service-preview-icon service-preview-package">
+              <Package size={20} />
+            </div>
+            <span>Package</span>
+          </div>
+          <div className="service-preview-item">
+            <div className="service-preview-icon service-preview-grocery">
+              <ShoppingBasket size={20} />
+            </div>
+            <span>Grocery</span>
+          </div>
+        </div>
+
+        {/* Single CTA button */}
+        <div className="home-cta-section">
+          <Button 
+            onClick={() => handleEvent({ type: 'GO_SERVICE' })} 
+            size="large" 
+            data-testid="cta-choose-service"
           >
-            Switch service
+            Choose a service
           </Button>
         </div>
       </div>
